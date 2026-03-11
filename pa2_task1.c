@@ -38,7 +38,7 @@ Please specify the group members here
 #define DEFAULT_CLIENT_THREADS 4
 // New macros for pipeline operation
 #define WINDOW_SIZE 100
-#define TIMEOUT 1000
+#define TIMEOUT 2000
 
 char *server_ip = "127.0.0.1";
 int server_port = 12345;
@@ -73,7 +73,7 @@ void *client_thread_func(void *arg) {
     epoll_ctl(data->epoll_fd, EPOLL_CTL_ADD, data->socket_fd, &event);
 
     // Send initial window of packets
-    for (int i = 0; i < WINDOW_SIZE; i++) {
+    for (int i = 0; i < WINDOW_SIZE && data->tx_cnt < num_requests; i++) {
         if (sendto(data->socket_fd, send_buf, MESSAGE_SIZE, 0, (struct sockaddr *)&data->server_addr, server_addr_len) < 0) {
             perror("Client send failed, exiting");
             close(data->epoll_fd);
